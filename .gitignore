@@ -10,6 +10,17 @@
 /[Ll]ogs/
 /[Mm]emoryCaptures/
 
+# This repository keeps the Unity project in a nested MatchBlock3D directory.
+# Ignore generated project state there as well so CI can reconstruct it cleanly.
+/MatchBlock3D/[Ll]ibrary/
+/MatchBlock3D/[Tt]emp/
+/MatchBlock3D/[Oo]bj/
+/MatchBlock3D/[Bb]uild/
+/MatchBlock3D/[Bb]uilds/
+/MatchBlock3D/[Ll]ogs/
+/MatchBlock3D/[Mm]emoryCaptures/
+/MatchBlock3D/[Uu]serSettings/
+
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
 
@@ -57,4 +68,3 @@ sysinfo.txt
 
 # Crashlytics generated file
 crashlytics-build.properties
-
