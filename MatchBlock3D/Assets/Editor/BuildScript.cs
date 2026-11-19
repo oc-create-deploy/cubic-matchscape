@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEditor.Build.Reporting;
 using UnityEditor.iOS.Xcode;
 using UnityEngine;
@@ -22,6 +23,7 @@ public static class BuildScript
         PlayerSettings.iOS.targetDevice = iOSTargetDevice.iPhoneOnly;
         PlayerSettings.iOS.targetOSVersionString = "15.0";
         PlayerSettings.iOS.appleEnableAutomaticSigning = false;
+        PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
         PlayerSettings.iOS.sdkVersion = string.Equals(
             Environment.GetEnvironmentVariable("UNITY_IOS_SIMULATOR"),
             "true",
@@ -41,10 +43,7 @@ public static class BuildScript
             BuildTargetGroup.iOS,
             Enumerable.Repeat(appIcon, iconSizes.Length).ToArray());
 
-        var scenes = EditorBuildSettings.scenes
-            .Where(scene => scene.enabled)
-            .Select(scene => scene.path)
-            .ToArray();
+        var scenes = new[] { BuildReleaseScene() };
 
         if (scenes.Length == 0)
         {
@@ -57,6 +56,8 @@ public static class BuildScript
             locationPathName = outputPath,
             target = BuildTarget.iOS,
             targetGroup = BuildTargetGroup.iOS,
+            extraScriptingDefines = string.Equals(Environment.GetEnvironmentVariable("UNITY_IOS_SIMULATOR"), "true", StringComparison.OrdinalIgnoreCase)
+                ? new[] { "PLAYABLE_IOS_SIMULATOR" } : new string[0],
             options = BuildOptions.CleanBuildCache
         });
 
@@ -70,5 +71,17 @@ public static class BuildScript
         plist.ReadFromFile(plistPath);
         plist.root.SetBoolean("ITSAppUsesNonExemptEncryption", false);
         plist.WriteToFile(plistPath);
+    }
+    private static string BuildReleaseScene()
+    {
+        const string path="Assets/Scenes/CubicRelease.unity";
+        var scene=EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
+        var game=new GameObject("Cubic Matchscape").AddComponent<MatchscapeGame>();
+        string shaderName=UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset!=null ? "Universal Render Pipeline/Lit" : "Standard";
+        var shader=Shader.Find(shaderName);if(shader==null) throw new InvalidOperationException("Required cube shader is missing: "+shaderName);
+        const string materialPath="Assets/Brand/MatchscapeCube.mat";
+        var material=AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+        if(material==null) {material=new Material(shader);AssetDatabase.CreateAsset(material,materialPath);}
+        game.cubeMaterial=material;AssetDatabase.SaveAssets();EditorSceneManager.SaveScene(scene,path);return path;
     }
 }
