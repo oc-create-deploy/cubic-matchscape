@@ -124,7 +124,7 @@ jobs:
           xcrun altool --upload-app --type ios --file "$IPA_PATH" --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
 
       - name: Upload IPA artifact
-        if: always()
+        if: ${{ false }}
         uses: actions/upload-artifact@v4
         with:
           name: cubic-matchscape-ios-${{ inputs.build_number }}

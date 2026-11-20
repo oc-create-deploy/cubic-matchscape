@@ -31,7 +31,7 @@ public sealed class MatchscapeGame : MonoBehaviour
         var backdrop=new GameObject("Background camera").AddComponent<Camera>();backdrop.depth=-10;backdrop.clearFlags=CameraClearFlags.SolidColor;backdrop.backgroundColor=new Color(.025f,.055f,.105f);backdrop.cullingMask=0;
         boardCamera=new GameObject("Puzzle camera").AddComponent<Camera>();boardCamera.tag="MainCamera";
         boardCamera.transform.position=new Vector3(5,10,-8);boardCamera.transform.LookAt(new Vector3(0,0,3));boardCamera.orthographic=true;boardCamera.orthographicSize=6;
-        boardCamera.rect=new Rect(0,.24f,1,.53f);boardCamera.backgroundColor=new Color(.045f,.09f,.16f);boardCamera.depth=0;
+        boardCamera.rect=new Rect(0,.24f,1,.53f);boardCamera.backgroundColor=new Color(.045f,.09f,.16f);boardCamera.clearFlags=CameraClearFlags.SolidColor;boardCamera.depth=0;
         var light=new GameObject("Soft key light").AddComponent<Light>();light.type=LightType.Directional;light.intensity=1.2f;light.transform.rotation=Quaternion.Euler(45,-35,0);
         RenderSettings.ambientLight=new Color(.65f,.7f,.8f);
         var panel=NativeUi.Create("Cubic Matchscape interface",false);
