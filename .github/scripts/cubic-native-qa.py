@@ -10,7 +10,8 @@ module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
 bridge=module.TouchBridge(out,udid,bundle)
 
 def state():
-    deadline = time.time()+90
+    global container
+    deadline = time.time()+180
     while time.time()<deadline:
         for p in container.rglob('qa-state.json'):
             try:
@@ -18,7 +19,12 @@ def state():
                 assert not s['errors'],s['errors']
                 if s["frame"] >= 30: return s
             except (json.JSONDecodeError,FileNotFoundError): pass
-        time.sleep(.5)
+        # Simulator can relocate the data container during a slow first launch.
+        try:
+            container = pathlib.Path(subprocess.check_output(['xcrun','simctl','get_app_container',udid,bundle,'data'],text=True).strip())
+        except subprocess.CalledProcessError: pass
+        time.sleep(1)
+    (out/'container-probe.txt').write_text(str(container)+'\n'+'\n'.join(str(p) for p in container.rglob('*') if p.is_file()))
     probe_errors=list(container.rglob('qa-recorder-error.txt'))
     if probe_errors:
         detail=probe_errors[0].read_text()
