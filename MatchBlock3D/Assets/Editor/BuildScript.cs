@@ -11,6 +11,16 @@ public static class BuildScript
 {
     public static void BuildIos()
     {
+        // The dedicated release scene uses standard-lit primitives. The imported
+        // URP asset is incomplete and throws SetupPerFrameShaderConstants on iOS.
+        UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset = null;
+        int previousQuality = QualitySettings.GetQualityLevel();
+        for (int i = 0; i < QualitySettings.names.Length; i++)
+        {
+            QualitySettings.SetQualityLevel(i, false);
+            QualitySettings.renderPipeline = null;
+        }
+        QualitySettings.SetQualityLevel(previousQuality, false);
         const string outputPath = "build/iOS";
         const string appIconPath = "Assets/Brand/CubicMatchscape-AppIcon.png";
         Directory.CreateDirectory(outputPath);
@@ -82,6 +92,7 @@ public static class BuildScript
         const string materialPath="Assets/Brand/MatchscapeCube.mat";
         var material=AssetDatabase.LoadAssetAtPath<Material>(materialPath);
         if(material==null) {material=new Material(shader);AssetDatabase.CreateAsset(material,materialPath);}
+        material.shader=shader;
         game.cubeMaterial=material;AssetDatabase.SaveAssets();EditorSceneManager.SaveScene(scene,path);return path;
     }
 }

@@ -72,6 +72,7 @@ def cold_launch():
     for p in container.rglob('qa-state.json'):p.unlink()
     subprocess.run(['xcrun','simctl','launch',udid,bundle],check=True);time.sleep(4)
 
+state() # Reject native runtime errors before spending time starting the touch driver.
 action('- tapOn:\n    point: "95%, 95%"')
 capture('01-board')
 assert len(cubes())==9,('Initial first puzzle incorrect',len(cubes()))
